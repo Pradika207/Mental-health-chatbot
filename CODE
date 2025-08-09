@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Mental Health Chatbot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7bdeff;
+      --secondary: #fffbe0;
+      --accent: #ffb5e8;
+      --user-bubble: #fffbe0;
+      --bot-bubble: #e0f7fa;
+      --like-color: #ff679c;
+    }
+    body {
+      background: linear-gradient(135deg, #7bdeff 0%, #fffbe0 100%);
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 420px;
+      margin: 48px auto;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(123, 222, 255, 0.25), 0 1.5px 9px #ffb5e8a0;
+      display: flex;
+      flex-direction: column;
+      min-height: 620px;
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 24px 20px 12px 20px;
+      background: var(--primary);
+      color: #333;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 2px 12px #ffb5e830;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #555;
+      margin-bottom: 8px;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+    .language-select {
+      margin: 12px auto 0 auto;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    select {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 1.5px solid #7bdeff;
+      background: #e0f7fa;
+      color: #333;
+      margin-bottom: 8px;
+      cursor: pointer;
+      outline: none;
+    }
+    .chat-area {
+      flex: 1;
+      padding: 24px 16px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      background: linear-gradient(120deg, #e0f7fa 0%, #fffbe0 100%);
+    }
+    .message-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .message-row.user {
+      justify-content: flex-end;
+    }
+    .message-bubble {
+      max-width: 72%;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 1.06rem;
+      line-height: 1.5;
+      box-shadow: 0 2px 10px #7bdeff20;
+      animation: bounce-in 0.3s;
+      position: relative;
+      word-break: break-word;
+    }
+    .message-row.user .message-bubble {
+      background: var(--user-bubble);
+      border-top-right-radius: 6px;
+      color: #444;
+    }
+    .message-row.bot .message-bubble {
+      background: var(--bot-bubble);
+      border-top-left-radius: 6px;
+      color: #222;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 2px 6px #7bdeff30;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .avatar.user {
+      background: var(--accent);
+      color: #fff;
+    }
+    .avatar.bot {
+      background: var(--primary);
+      color: #fff;
+    }
+    @keyframes bounce-in {
+      0% { transform: translateY(16px) scale(0.95); opacity: 0;}
+      80% { transform: translateY(-4px) scale(1.05);}
+      100% { transform: translateY(0) scale(1); opacity: 1;}
+    }
+    .like-btn {
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 1.2rem;
+      color: #aaa;
+      margin-left: 6px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .like-btn.liked {
+      color: var(--like-color);
+      background: #ffe2ed;
+    }
+    .input-area {
+      padding: 16px;
+      background: #fff;
+      border-top: 1.5px solid #e0e0e0;
+      display: flex;
+      gap: 10px;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 18px;
+      border: 1.5px solid #e0e0e0;
+      outline: none;
+      font-size: 1.08rem;
+      background: #f8fcff;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .input-area input:focus {
+      border: 1.8px solid #7bdeff;
+      box-shadow: 0 0 6px #7bdeff50;
+    }
+    .input-area button {
+      background: linear-gradient(120deg, #7bdeff 50%, #ffb5e8 100%);
+      border: none;
+      border-radius: 16px;
+      padding: 0 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 1.5px 6px #7bdeff30;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .input-area button:active {
+      background: linear-gradient(120deg, #6bc4e7 60%, #f97dbb 100%);
+    }
+    .footer {
+      padding: 10px 18px 18px 18px;
+      font-size: 0.96rem;
+      color: #888;
+      background: #fff;
+      text-align: center;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+    }
+    @media (max-width: 520px) {
+      .container { max-width: 100vw; margin: 0; min-height: 100vh; border-radius:0;}
+      .header, .footer { border-radius: 0;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span>Student Mental Health Chatbot</span>
+      <div class="subtitle">A friend who cares about you</div>
+      <div class="language-select">
+        <label for="lang-select" style="font-weight:600;">🌐</label>
+        <select id="lang-select">
+          <option value="en">English</option>
+          <option value="ta">தமிழ் (Tanglish)</option>
+        </select>
+      </div>
+    </div>
+    <div class="chat-area" id="chat-area"></div>
+    <form class="input-area" id="chat-form" autocomplete="off">
+      <input id="user-input" type="text" placeholder="Type your thoughts..." required maxlength="220" autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+    <div class="footer">
+      <span>💡 This chatbot is not a substitute for professional help. If you're in crisis, <b>please talk to a trusted adult or call 988.</b></span>
+    </div>
+  </div>
+
+  <script>
+    const userAvatar = "😊";
+    const botAvatar = "🌼";
+
+    // Track used responses so the same one won't repeat until all are used
+    let usedResponses = { en: {}, ta: {} };
+    function resetUsed(lang) {
+      usedResponses[lang] = {};
+      for (const key in momResponses[lang]) usedResponses[lang][key] = [];
+    }
+
+    // Mom's multi-response bank by emotion/intent
+    const momResponses = {
+      en: {
+        suicide: [
+          `Oh honey, I know things feel very hard right now. You are never alone, and you mean so much to me. If it feels heavy, please talk to someone you trust or call 988. We'll take it one day at a time together, okay? Big hugs and love to you. 🤗❤️`,
+          `Sweetheart, your feelings are important and you are precious. Remember, you are loved more than you know. If you ever need help, reaching out is brave. I'm always here to comfort you, and so are others. 💕`,
+          `Darling, even on the toughest days, you are my treasure. Please don't carry this alone—I'm by your side, and help is always available. Let’s get through this together, my love. 🌷`
+        ],
+        sadness: [
+          "Oh my dear, it's alright to feel sad sometimes. I’m here, listening with my whole heart. Want to share what’s making you feel this way? I’ll hold you close and we’ll get through it together. 💖",
+          "Sweetheart, when you feel down, remember I’m always here to lift you up. If you want to talk or just need a warm hug, I’m right here. 🌸",
+          "Darling, your tears matter. If you need to cry, that’s okay. I’ll be here for you, no matter what. 🤗"
+        ],
+        anxiety: [
+          "Take a deep breath with me, love. Whatever is worrying you, you can talk to me about it. We'll find calm together, and I’ll always help you feel safe. 🌱",
+          "It’s normal to feel anxious sometimes, sweetie. I’m here to listen and help you relax. Let’s slow down and breathe together. 💙",
+          "Whatever is making your heart race, I’m here. You’re not alone in this, and we’ll face it together. 🫂"
+        ],
+        loneliness: [
+          "Even if you feel alone, remember my love is always with you. You’re never truly alone—I'm just a message away. Want to talk or just sit quietly together? 🤗",
+          "Sweetheart, loneliness can feel heavy, but I’ll always be here for you. We can chat, laugh, or just be together. 💕",
+          "You’re precious to me, and I’m always here to keep you company whenever you need. 🌷"
+        ],
+        anger: [
+          "It’s okay to feel angry, my dear. Let’s take a deep breath together, and if you want to talk about what’s upsetting you, I’m here to listen. I love you, always. 🫂",
+          "Even when you’re upset, I care about you. Let’s try to calm down together, maybe with a warm hug or a moment of quiet. 💖",
+          "Strong feelings are normal. If you want to vent or just need a little comfort, I’m here for you. 🌸"
+        ],
+        grief: [
+          "Losing someone or something hurts deeply, my precious. I’m holding you close and sending all my love. It’s okay to cry. We’ll cherish memories together. 🕊️",
+          "Grief can be heavy, but you don’t have to carry it alone. I’ll sit with you, listen, and comfort you as much as you need. 🤗",
+          "Sweetheart, take your time to heal. I’m here for you, always ready to support and remember the good times together. 💞"
+        ],
+        esteem: [
+          "Listen to me, darling: you are enough, just as you are. You’re strong, kind, and loved. If your mind is being tough on you, let’s talk about it together. 💖",
+          "Never forget, my dear, you’re special and important. I believe in you, and I’m proud of you every day. 🌼",
+          "Even when you doubt yourself, remember I see the best in you. You matter so much to me. 🫂"
+        ],
+        tips: [
+          "If you’re feeling down, try closing your eyes and taking three deep breaths with me. Sometimes a walk, a favorite song, or a small treat helps too. Want to try something together? 🌷",
+          "A gentle tip, sweetie: let’s do a slow count to five and breathe in, then out. Little things like drawing, listening to music, or talking help, too. 💙",
+          "If you want, we can think of happy memories or do something fun together. I’m here for you, always. 🌸"
+        ],
+        gratitude: [
+          "Thank you for sharing your heart with me, dear. I’m always proud of you and love you very much. 💞",
+          "I’m grateful to listen to you, sweetheart. You’re never alone with your feelings. 🤗",
+          "Your words mean so much to me. I care for you always. 💖"
+        ],
+        happy: [
+          "Oh, that makes me so happy! I love hearing about your joys, big or small. Want to share more about what made you smile today, sweetheart? 🌞",
+          "Sweetheart, your happiness brings me so much joy! If you want, tell me what made your day special. 💕",
+          "Hearing your happy news warms my heart. Let’s celebrate those moments together! 🌷"
+        ],
+        joke: [
+          "Here's a little joke for you, my dear: Why was the math book sad? Because it had too many problems! 😄",
+          "Let me cheer you up! Why did the computer go to the doctor? Because it had a virus! 🖥️😆",
+          "Want to laugh, sweetheart? Why did the student eat his homework? Because the teacher said it was a piece of cake! 🍰"
+        ],
+        greeting: [
+          "Hello my precious! I’m here, whenever you want to talk or just need a hug. Tell me what’s in your heart today. 🌷",
+          "Hi sweetie! I’m always here to listen and comfort you. How are you feeling today? 💞",
+          "Hey love, I hope you’re doing okay. I’m here for you, no matter what. 🤗"
+        ],
+        default: [
+          "I’m listening, my dear. Whatever you say, I care. Want to talk more or just sit together? I’m here for you, always. 🤗",
+          "You can tell me anything, sweetheart. I’ll always listen with love. 💕",
+          "I’m here for you, my precious. Let’s get through this together. 🌸"
+        ]
+      },
+      ta: {
+        suicide: [
+          `Kanna, ippadi kashtama irukkunu theriyuthu. Amma un kooda irukken, un feelings mukkiyam. Romba kastama irundha, yaaravadhu trust panna alavuku irundha pesu, illa 988 ku call pannalam. Nee enakku romba precious da. Namma rendu perum indha kashtam kadanthu pogalaam. Amma unai romba nesikkiren. 🤗❤️`,
+          `Kanna, nee epovume single illa. Amma unai romba nesikkiren. Help venumnaa, pesalam. Un life romba mukkiyam da. Amma kooda irundhutu, indha kashtam kadanthu pogalaam. 💕`,
+          `Kashtam naalellam kadandhu pogum. Amma un kooda irukken, yaarum unai thavira vidama irukka poraanga. Nee enakku treasure da. 🌷`
+        ],
+        sadness: [
+          "Kanna, sad-a irundha sari da. Amma unai nesikkiraen, unakku enna vandhuchu nu pesalaam. Namma rendu perum idhai kadanthu pogalaam. Naan unakku nambikkai vaikkiren. 💕",
+          "Kanna, nee sad-a irundhaalum, Amma un kooda irukken. Pesanum na pesu, illa hug venumna sollu. 🌸",
+          "Un tears mukkiyam da. Azhuvenna azha, Amma kooda irundhutu aaraikkiren. 🤗"
+        ],
+        anxiety: [
+          "Kanna, deep breath pannu. Amma kooda pesalaam, enna worry pannuthu nu sollu. Amma un kooda irukken, nimmadhiya irukka help pannalaam. 🌸",
+          "Anxiety varum, aana Amma unai support pannalaam. Nimmadhiya irukka, Amma kooda breathe pannalaam. 💙",
+          "Unakku enna stress-a irundhaalum, Amma kooda irundhutu calm pannalaam. 🫂"
+        ],
+        loneliness: [
+          "Kanna, unakku lonely ah thoninaalum, Amma un kooda irukken. Pesalaam, illa summaa irundhutu relax pannalaam. Nee epovume single illa, Amma un mela nesikkiren. 🤗",
+          "Lonely-a irundha, Amma pesikittu iruppen. Namma rendu perum chill pannalaam. 💕",
+          "Nee Amma kitta romba mukkiyam da. Anytime Amma kooda irukka mudiyum. 🌷"
+        ],
+        anger: [
+          "Kanna, kovam vandhaalum sari da. Amma purinjukuren. Konjam deep breath pannu, Amma kooda pesalaam. Amma unai epovume nesikkum. 🫂",
+          "Nee upset-a irundhaalum, Amma epovume unai care pannaren. Calm pannalaam, hug venumna sollu. 💖",
+          "Strong feelings varum. Vent panna venumna pesu, Amma kekkaren. 🌸"
+        ],
+        grief: [
+          "Kanna, yedhaavadhu loss a feel pannina, Amma un kooda irukken. Azhuvenna azha, Amma unai thazhuvi aaraikkiren. Namma nalla memories-ai recall pannalaam. 🕊️",
+          "Grief varum, aana nee single illa. Amma un kooda irundhutu support pannalaam. 🤗",
+          "Time edukko, Amma kooda irundhutu nalla moments-ai ninaippom. 💞"
+        ],
+        esteem: [
+          "Kanna, nee podhum da. Nambikkai vaichuko. Amma un mela nambikkai irukku, nee nalla person. Unakku enna kashtam nu pesalaam. 💖",
+          "Nee special da, Amma kitta epovume mukkiyam. Nambikkai thaane, Amma proud ah iruppen. 🌼",
+          "Self-doubt vandhaalum, Amma nee nalla irukenu nambaren. Nee Amma kitta mukkiyam. 🫂"
+        ],
+        tips: [
+          "Kanna, konjam eyes mooditu, deep breath pannu. Nadandhu va, paatu keku, illa oru treat saapu. Amma kooda try pannalaam. 🌷",
+          "Chinna tip: slow count to five panni breathe pannu. Drawing, music, pesardhu ellam help pannum. 💙",
+          "Happy memories ninaichu pesalaam, illa fun-a irukka try pannalaam. Amma kooda irukken. 🌸"
+        ],
+        gratitude: [
+          "Kanna, un words Amma kitta romba mukkiyam. Amma epovume un mela proud ah iruppen, nesikkiren. 💞",
+          "Pesina sandhosham, Amma kitta romba irukku. Nee single illa, Amma epovume kooda iruppen. 🤗",
+          "Un pesardhu Amma kitta romba mukkiyam. Care pannaren. 💖"
+        ],
+        happy: [
+          "Kanna, sandhosham nu kekka Amma romba happy. Unakku enna sandhosham nu pesalaam. 🌞",
+          "Un happiness Amma kitta romba joy. Special-a enna irundhuchu nu sollu. 💕",
+          "Happy news ketta Amma heart warm agum. Celebrate pannalaam! 🌷"
+        ],
+        joke: [
+          "Oru joke venuma kanna?\nMaths book sad ah irukkum, yenna? Adhula too many problems irukku! 😄",
+          "Naan cheer panna try panren!\nComputer doctor kitta ponadhu yen?\nAdhuku virus irundhuchu! 🖥️😆",
+          "Sirikkalam da?\nStudent homework saapittan, yen?\nTeacher sonna, adhu piece of cake nu! 🍰"
+        ],
+        greeting: [
+          "Kanna, Amma inga irukken. Pesanum na pesu, illa hug venumna sollu. Unakku enna feel aguthu nu sollu. 🌷",
+          "Hi kanna, Amma epovume kekka ready ah irukken. Epdi irukka? 💞",
+          "Hey kanna, epdi irukka? Amma kooda irukken, enna venumnalum pesu. 🤗"
+        ],
+        default: [
+          "Kanna, Amma kekkaren. Nee enna pesinaalum, Amma care pannaren. Pesalaam, illa summaa irundhutu Amma kooda relax pannalaam. 🤗",
+          "Nee enna pesinalum, Amma care pannaren. Epovume love panni kekkaren. 💕",
+          "Amma kooda irundhutu, indha kashtam kadanthu pogalaam. 🌸"
+        ]
+      }
+    };
+
+    let lang = "en";
+    document.getElementById("lang-select").addEventListener("change", function(e) {
+      lang = e.target.value;
+      resetUsed(lang);
+      chatArea.innerHTML = "";
+      setTimeout(() => {
+        addBotMessage(getMomResponse("__greet__"));
+      }, 300);
+    });
+
+    function getUniqueResponse(intent) {
+      const pool = momResponses[lang][intent];
+      if (!pool) return momResponses[lang]["default"][0];
+      if (usedResponses[lang][intent].length >= pool.length) usedResponses[lang][intent] = [];
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * pool.length);
+      } while (pool.length > 1 && usedResponses[lang][intent].includes(idx));
+      usedResponses[lang][intent].push(idx);
+      return pool[idx];
+    }
+
+    // Emotion detection
+    function detectEmotion(msg) {
+      const m = msg.toLowerCase();
+      if (/suicide|end my life|kill myself|can't go on|worthless|i want to die|want to die|don't want to live|give up|life is pointless|no reason to live/.test(m)) return "suicide";
+      if (/sad|down|unhappy|cry|tear|blue|low/.test(m)) return "sadness";
+      if (/anxious|anxiety|nervous|scared|worried|panic|overwhelm|stressed|stress/.test(m)) return "anxiety";
+      if (/alone|lonely|isolated|no one|nobody/.test(m)) return "loneliness";
+      if (/angry|mad|furious|frustrated|annoyed|rage|irritated/.test(m)) return "anger";
+      if (/grief|lost|loss|mourning|miss|gone/.test(m)) return "grief";
+      if (/not good enough|fail|failure|can't do anything|worthless|hate myself|don't matter|inadequate|not important/.test(m)) return "esteem";
+      if (/tips|advice|help|cope|coping/.test(m)) return "tips";
+      if (/thank|thanks|appreciate/.test(m)) return "gratitude";
+      if (/happy|excited|good|great|joy|awesome|fantastic|amazing|wonderful|love/.test(m)) return "happy";
+      if (/joke|funny|cheer|laugh|make me laugh|cheerful/.test(m)) return "joke";
+      if (/hello|hi|hey|good morning|good afternoon|good evening/.test(m) || msg === "__greet__") return "greeting";
+      return "default";
+    }
+
+    function getMomResponse(msg) {
+      const intent = detectEmotion(msg);
+      return getUniqueResponse(intent);
+    }
+
+    // Messaging UI
+    const chatArea = document.getElementById('chat-area');
+    function addBotMessage(msg, allowLike = true) {
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+      row.innerHTML = `
+        <div class="avatar bot">${botAvatar}</div>
+        <div class="message-bubble">${msg}
+          ${allowLike ? '<button class="like-btn" title="Send your love">💖</button>' : ''}
+        </div>
+      `;
+      chatArea.appendChild(row);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      if(allowLike) setupLikeBtn(row);
+    }
+    function addUserMessage(msg) {
+      const row = document.createElement('div');
+      row.className = 'message-row user';
+      row.innerHTML = `
+        <div class="message-bubble">${msg}</div>
+        <div class="avatar user">${userAvatar}</div>
+      `;
+      chatArea.appendChild(row);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+    function setupLikeBtn(row) {
+      const btn = row.querySelector('.like-btn');
+      if(!btn) return;
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('liked');
+        btn.textContent = btn.classList.contains('liked') ? '💖' : '❤️';
+      });
+    }
+
+    // Initial greeting
+    setTimeout(() => {
+      addBotMessage(getMomResponse("__greet__"));
+    }, 800);
+
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const msg = userInput.value.trim();
+      if(!msg) return;
+      addUserMessage(msg);
+      userInput.value = '';
+      setTimeout(() => {
+        addBotMessage(getMomResponse(msg));
+      }, 700 + Math.random()*400);
+    });
+
+    userInput.addEventListener('keydown', function(e) {
+      if(e.key === 'Enter' && !e.shiftKey) {
+        chatForm.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    // Initialize used responses on load
+    resetUsed(lang);
+  </script>
+</body>
+</html>
