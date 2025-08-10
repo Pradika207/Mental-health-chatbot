@@ -22,10 +22,5 @@ CSS3
 
 JavaScript (Vanilla)
 
-🚀 How to Use
-Clone or download this repository.
-
-Open the index.html file in your browser.
-
 Start chatting!
 
